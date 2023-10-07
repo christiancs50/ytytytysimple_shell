@@ -7,9 +7,9 @@
 
 void run_command(const char *command)
 {
+	char command_buffer[MAX_INPUT_SIZE];
 	int status;
 	pid_t child_pid = fork();
-	char *const arguments[] = {"/bin/sh", "-c", (char *)command, NULL};
 
 	if  (child_pid == -1)
 	{
@@ -18,6 +18,13 @@ void run_command(const char *command)
 	}
 	else if (child_pid == 0)
 	{
+		char *arguments[] = {"/bin/sh", "-c", NULL, NULL};
+
+		strncpy(command_buffer, command, sizeof(command_buffer));
+		command_buffer[sizeof(command_buffer) -1] = '\0';
+
+		arguments[2] = command_buffer;
+
 		if (execve("/bin/sh", arguments, NULL) == -1)
 		{
 			perror("execve");
