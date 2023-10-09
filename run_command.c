@@ -2,12 +2,11 @@
 
 /**
  * run_command - Function to execute a command
- * @command: the command to execute
+ * @args: the arrayh of command and its arguments
  */
 
-void run_command(const char *command)
+void run_command(char *args[])
 {
-	char command_buffer[MAX_INPUT_SIZE];
 	int status;
 	pid_t child_pid = fork();
 
@@ -19,14 +18,13 @@ void run_command(const char *command)
 	}
 	else if (child_pid == 0)
 	{
-		char *arguments[] = {"/bin/sh", "-c", NULL, NULL};
+		if (access(args[0], X_OK) == -1)
+		{
+			perror(args[0]);
+			exit(EXIT_FAILURE);
+		}
 
-		strncpy(command_buffer, command, sizeof(command_buffer));
-		command_buffer[sizeof(command_buffer) -1] = '\0';
-
-		arguments[2] = command_buffer;
-
-		if (execve("/bin/sh", arguments, NULL) == -1)
+		if (execve(args[0], args, NULL) == -1)
 		{
 			perror("execve");
 			exit(EXIT_FAILURE);
@@ -34,8 +32,7 @@ void run_command(const char *command)
 	}
 	else
 	{
-	waitpid(child_pid, &status, 0);
+		waitpid(child_pid, &status, 0);
 
 	}
 }
-
