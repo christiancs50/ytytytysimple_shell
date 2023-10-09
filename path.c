@@ -1,7 +1,6 @@
 #include "shell.h"
 /**
  * execute_command_from_path - Function to execute a command found in the PATH
- * @command: the command to execute
  * @args: the array of command and its arguments
  */
 
