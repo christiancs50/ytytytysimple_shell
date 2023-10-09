@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * sig_handler(int signum)
+ * sig_handler - Signal handler for SIGINT and SIGTSTP
  * @signum: The signal number
  *
  */
