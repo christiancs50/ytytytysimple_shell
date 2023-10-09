@@ -42,5 +42,3 @@ char *read_user_command(void)
 
 	return (input);
 }
-
-
