@@ -18,5 +18,5 @@ int tokenize_command(char *command, char *args[])
 	}
 
 	args[num_args] = NULL;
-	return num_args;
+	return (num_args);
 }
