@@ -2,19 +2,43 @@
 
 int main(void)
 {
-    while (1) {
-        char *command = read_user_command();
+	int num_args;
+	char *args[MAX_ARGUMENTS];
 
-        if (command == NULL) {
-            break;
-        }
+	signal(SIGINT, sig_handler);
+        signal(SIGSTOP, sig_handler);
 
-        if (str_len(command) > 0) {
-            run_command(command);
-        }
+	while (1)
+	{
+		char *command = read_user_command();
 
-        free(command);
-    }
+		if (command == NULL)
+		{
+			break;
+		}
+
+		if (strcmp(command, "exit") == 0)
+		{
+			free(command);
+			break;
+		}
+
+		num_args = tokenize_command(command, args);
+
+		if (num_args > 0)
+		{
+			if (command[0] == '/')
+			{
+				run_command(args);
+			}
+			else
+			{
+				execute_command_from_path(args);
+			}
+		}
+
+	free(command);
+	}
 
     return 0;
 }
