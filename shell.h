@@ -22,5 +22,7 @@ char *read_user_command(void);
 void _print(const char *message);
 void sig_handler(int signum);
 void execute_command_from_path(char *args[]);
+void env_builtin(void);
+extern char **environ;
 
 #endif /* SHELL_H */
