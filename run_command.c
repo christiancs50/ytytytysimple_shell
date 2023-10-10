@@ -20,7 +20,7 @@ void run_command(char *args[])
 	{
 		if (access(args[0], X_OK) == -1)
 		{
-			perror(args[0]);
+			execute_command_from_path(args);
 			exit(EXIT_FAILURE);
 		}
 
@@ -32,7 +32,8 @@ void run_command(char *args[])
 	}
 	else
 	{
-		waitpid(child_pid, &status, 0);
+	waitpid(child_pid, &status, 0);
 
 	}
 }
+
