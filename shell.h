@@ -24,5 +24,6 @@ void sig_handler(int signum);
 void execute_command_from_path(char *args[]);
 void env_builtin(void);
 extern char **environ;
+int command_exist(const char *command);
 
 #endif /* SHELL_H */
