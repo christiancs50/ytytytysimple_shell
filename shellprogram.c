@@ -53,7 +53,7 @@ int command_exists(const char *command)
 
 	return (0); /* Command not found */
 }
-extern char **environ; 
+
 /**
  * enact_command - enacts a command with arguments using fork & execve
  * @command: The command to be enacted
@@ -61,8 +61,8 @@ extern char **environ;
  *
  * Return: Void
  */
-void enact_command(const char *command, char *pcargs[], char *const envp[]);
-void enact_command(const char *command, char *pcargs[], char *const envp[])
+void enact_command(const char *command, char *pcargs[]);
+void enact_command(const char *command, char *pcargs[])
 {
 	pid_t pcpid;
 
@@ -78,19 +78,6 @@ void enact_command(const char *command, char *pcargs[], char *const envp[])
 		exit(EXIT_SUCCESS);
 	}
 
-	
-	if (_strcmp(command, "env") == 0)
-	{
-		char **env_var = environ;
-
-		while (*env_var != NULL)
-		{
-			printf("%s\n", *env_var);
-			env_var++;
-		}
-
-		return;
-	}
 
 	pcpid = fork();
 
@@ -176,7 +163,7 @@ int main(void)
 		}
 
 		pcargs[arg_count] = NULL;
-		enact_command(command, pcargs,envp);
+		enact_command(command, pcargs);
 	}
 
 	return (0);
