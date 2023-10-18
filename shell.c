@@ -1,84 +1,47 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <string.h>
-
-#define MAX_INPUT_SIZE 1024
-
+#include "shell.h"
 
 /**
- * enact_pc_command - Execute a command in a child process
- * @command: The command to execute
+ * main - Function is the entry point for my simple shell program
+ * Return: 0
  */
-void enact_pc_command(char *command)
-{
-	pid_t pcpid = fork();
 
-	if (pcpid == -1)
-	{
-		perror("fork");
-		return;
-	}
-
-	if (pcpid == 0)
-	{
-		char *argv[3];
-		argv[0] = "sh";
-		argv[1] = "-c";
-		argv[2] = command;
-
-		if (execvp("sh", argv) == -1)
-		{
-			perror(command);
-			_exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		int status;
-
-		waitpid(pcpid, &status, 0);
-	}
-}
-
-
-/**
- * main - Entry point for the shell program
- *
- * Return: Always 0
- */
 int main(void)
 {
-	char insert[MAX_INPUT_SIZE];
-	size_t length;
+	int num_args;
+	char *args[MAX_ARGUMENTS];
+
+	signal(SIGINT, sig_handler);
+	signal(SIGSTOP, sig_handler);
 
 	while (1)
 	{
-		printf("$ ");
-		fflush(stdout);
+		char *command = read_user_command();
 
-		if (fgets(insert, MAX_INPUT_SIZE, stdin) == NULL)
+		if (command == NULL)
 		{
-			perror("fgets");
-			exit(EXIT_FAILURE);
+			break;
 		}
 
-		length = strlen(insert);
-
-		if (length > 0 && insert[length - 1] == '\n')
+		if (strcmp(command, "exit") == 0)
 		{
-			insert[length - 1] = '\0';
+			free(command);
+			break;
 		}
 
-		enact_pc_command(insert);
+		if (strcmp(command, "env") == 0)
+		{
+			env_builtin();
+		}
+
+		num_args = tokenize_command(command, args);
+
+		if (num_args > 0)
+		{
+			run_command(args);
+		}
+
+		free(command);
 	}
 
 	return (0);
 }
-
