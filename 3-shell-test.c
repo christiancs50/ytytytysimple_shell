@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-#define MAX_INSERT_SIZE 300
-#define PATH_MAX 600
+#define MAX_INPUT_SIZE 1024
+#define PATH_MAX 4096
 
 /**
  * _strcmp - compares two strings character by character
@@ -17,7 +17,7 @@
  *
  * Return: An integer (s1 - s2)
  */
-int _strcmp(const char *s1, const char *s2)
+int _strcmp(char *s1, char *s2)
 {
 	while (*s1 && (*s1 == *s2))
 	{
@@ -33,7 +33,7 @@ int _strcmp(const char *s1, const char *s2)
  *
  * Return: If found 1, otherwise 0
  */
-int command_exists(const char *command)
+int command_exists(char *command)
 {
 	char *pc_path = getenv("PATH");
 	char *pc_token = strtok(pc_path, ":");
@@ -53,42 +53,22 @@ int command_exists(const char *command)
 
 	return (0); /* Command not found */
 }
-extern char **environ; 
+
+
 /**
- * enact_command - enacts a command with arguments using fork & execve
- * @command: The command to be enacted
+ * enact_command - executes a command with arguments using fork & execve
+ * @command: The command to be executed
  * @pcargs: An array of strings representing the command and its arguments.
  *
  * Return: Void
  */
-void enact_command(const char *command, char *pcargs[], char *const envp[]);
-void enact_command(const char *command, char *pcargs[], char *const envp[])
+void enact_command(char *command, char *pcargs[])
 {
 	pid_t pcpid;
 
 	if (!command_exists(command))
 	{
 		fprintf(stderr, "Command not found: %s\n", command);
-		return;
-	}
-
-	if (_strcmp(command, "exit") == 0)
-	{
-		printf("Exiting shell...\n");
-		exit(EXIT_SUCCESS);
-	}
-
-	
-	if (_strcmp(command, "env") == 0)
-	{
-		char **env_var = environ;
-
-		while (*env_var != NULL)
-		{
-			printf("%s\n", *env_var);
-			env_var++;
-		}
-
 		return;
 	}
 
@@ -102,7 +82,7 @@ void enact_command(const char *command, char *pcargs[], char *const envp[])
 
 	if (pcpid == 0)
 	{ /* Child process */
-		if (execvp(command, pcargs) == -1)
+		if (execve(command, pcargs, NULL) == -1)
 		{
 			perror(command);
 			_exit(EXIT_FAILURE);
@@ -119,24 +99,24 @@ void enact_command(const char *command, char *pcargs[], char *const envp[])
 /**
  * main - entry point of the program
  *
- * Return: 0 Always to indicate (success)
+ * Return: Always 0 (success)
  */
 int main(void);
 int main(void)
 {
-	char insert[MAX_INSERT_SIZE];
+	char insert[MAX_INPUT_SIZE];
 
 	while (1)
 	{
 		char *pc_token;
 		char *command;
-		char *pcargs[MAX_INSERT_SIZE];
+		char *pcargs[MAX_INPUT_SIZE];
 		int arg_count = 1;
 
 		printf(":) ");
 		fflush(stdout);
 
-		if (fgets(insert, MAX_INSERT_SIZE, stdin) == NULL)
+		if (fgets(insert, MAX_INPUT_SIZE, stdin) == NULL)
 		{
 			if (feof(stdin))
 			{
@@ -150,23 +130,16 @@ int main(void)
 			}
 		}
 
-		/* Separate commands and arguments by tokenizing the input.*/
+		/* Tokenize the input to separate command and arguments */
 		pc_token = strtok(insert, " \n");
 		command = pc_token;
 		pcargs[0] = command;
 
-		/* separately handle "exit" */
-		if (_strcmp(command, "exit") == 0)
-		{
-			printf("Exiting shell...\n");
-			exit(EXIT_SUCCESS);
-		}
-
-		/* Before forking, verify that the command is present. */
+		/* Check if the command exists before forking */
 		if (!command_exists(command))
 		{
 			fprintf(stderr, "Command not found: %s\n", command);
-			continue; /* Go straight to the next iteration */
+			continue; /* Skip to the next iteration */
 		}
 
 		while (pc_token != NULL)
@@ -175,10 +148,8 @@ int main(void)
 			pcargs[arg_count++] = pc_token;
 		}
 
-		pcargs[arg_count] = NULL;
-		enact_command(command, pcargs,envp);
+		enact_command(command, pcargs);
 	}
 
 	return (0);
 }
-
