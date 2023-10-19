@@ -5,12 +5,10 @@
  * Return: 0
  */
 
-int main(int ac, char **argv)
+int main(void)
 {
 	int num_args;
 	char *args[MAX_ARGUMENTS];
-	(void) ac;
-	(void) argv;
 
 	signal(SIGINT, sig_handler);
 	signal(SIGSTOP, sig_handler);
