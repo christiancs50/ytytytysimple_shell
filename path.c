@@ -21,8 +21,9 @@ void execute_command_from_path(char *args[])
 			found = 1;
 			break;
 		}
-	token = strtok(NULL, ":");
+		token = strtok(NULL, ":");
 	}
+
 	if (!found)
 	{
 		_print("Command not found in PATH.\n");
