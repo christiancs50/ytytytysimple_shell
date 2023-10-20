@@ -23,6 +23,8 @@ char *read_user_command(void)
 		exit(EXIT_FAILURE);
 	}
 
+	memset(input, 0, MAX_INPUT_SIZE);
+
 	shell_prompt();
 	readbyte = read(STDIN_FILENO, input, MAX_INPUT_SIZE);
 
@@ -35,6 +37,7 @@ char *read_user_command(void)
 
 	if (readbyte == 0)
 	{
+		_print("\n");
 		free(input);
 		return (NULL);
 	}
