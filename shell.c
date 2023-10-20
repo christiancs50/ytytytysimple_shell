@@ -42,7 +42,6 @@ int main(int ac, char **argv)
 		if (num_args > 0)
 		{
 			run_command(args);
-			free_buffers(args);
 		}
 		free(command);
 
