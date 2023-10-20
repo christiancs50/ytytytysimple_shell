@@ -30,7 +30,7 @@ char *read_user_command(void)
 	{
 		perror("read");
 		free(input);
-		return(NULL);
+		return (NULL);
 	}
 
 	if (readbyte == 0)
